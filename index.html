@@ -499,6 +499,7 @@ footer {
   </div>
 
   <button id="admin-btn" onclick="showAdminLogin()" style="
+    display:none;
     background:rgba(255,255,255,0.08);
     border:1px solid rgba(255,255,255,0.2);
     color:#94a3b8;
@@ -1229,6 +1230,13 @@ document.addEventListener('keydown', e => {
     } else {
       bar.style.display = 'none';
     }
+  }
+});
+
+/* SECRET ADMIN UNLOCK — Ctrl + Shift + A */
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+    showAdminLogin();
   }
 });
 
