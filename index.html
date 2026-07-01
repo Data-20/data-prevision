@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 :root {
   --navy:   #070F1E;
@@ -176,7 +177,7 @@ nav {
   display:inline-flex; align-items:center; gap:.5rem;
 }
 .btn-primary {
-  background:linear-gradient(135deg, var(--mid), var(--accent));
+  background:transparent;
   color:#fff; box-shadow:0 4px 24px rgba(56,189,248,.28);
 }
 .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(56,189,248,.45); }
@@ -416,7 +417,7 @@ footer {
   display:flex; flex-direction:column; align-items:flex-end; gap:.5rem;
 }
 .edit-toggle {
-  background:linear-gradient(135deg, var(--mid), var(--accent));
+  background:transparent;
   color:#fff; border:none; padding:.7rem 1.4rem; border-radius:8px;
   cursor:pointer; font-weight:700; font-size:.85rem; font-family:'Inter';
   box-shadow:0 4px 20px rgba(56,189,248,.3);
@@ -466,6 +467,9 @@ footer {
 @media(max-width:600px){
   .services-grid { grid-template-columns:1fr; }
 }
+@media(max-width:800px){
+  #charts-grid { grid-template-columns:1fr !important; }
+}
 </style>
 </head>
 <body class="">
@@ -493,7 +497,115 @@ footer {
     <button class="lang-btn" onclick="setLang(&#39;fr&#39;)">FR</button>
     <button class="lang-btn" onclick="setLang(&#39;ar&#39;)">AR</button>
   </div>
+
+  <button id="admin-btn" onclick="showAdminLogin()" style="
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#94a3b8;
+    padding:6px 12px;
+    border-radius:6px;
+    font-size:11px;
+    cursor:pointer;
+    margin-left:8px;
+    letter-spacing:0.5px;
+    transition:all .2s;
+  " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">⚙ Admin</button>
 </nav>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;">
+  <div style="background:#0d1b2a;border:1px solid rgba(56,189,248,0.3);border-radius:16px;padding:2rem;width:320px;text-align:center;">
+    <h3 style="color:#e2e8f0;margin-bottom:1rem;font-size:1.1rem;">🔐 Accès Admin</h3>
+    <input id="admin-pwd" type="password" placeholder="Mot de passe" style="
+      width:100%;padding:10px 14px;border-radius:8px;
+      background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+      color:#e2e8f0;font-size:14px;margin-bottom:0.8rem;box-sizing:border-box;
+    " onkeydown="if(event.key==='Enter') checkAdminPwd()">
+    <div id="admin-error" style="color:#f87171;font-size:12px;margin-bottom:0.5rem;display:none;">Mot de passe incorrect</div>
+    <button onclick="checkAdminPwd()" style="
+      background:linear-gradient(135deg,#38bdf8,#818cf8);
+      border:none;color:#fff;padding:10px 24px;border-radius:8px;
+      font-size:14px;cursor:pointer;width:100%;margin-bottom:0.5rem;
+    ">Connexion</button>
+    <button onclick="closeAdminModal()" style="
+      background:transparent;border:1px solid rgba(255,255,255,0.15);
+      color:#94a3b8;padding:8px 24px;border-radius:8px;font-size:13px;cursor:pointer;width:100%;
+    ">Annuler</button>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="admin-dashboard" style="display:none;position:fixed;inset:0;background:#07101e;z-index:9998;overflow-y:auto;">
+  <div style="max-width:1100px;margin:0 auto;padding:2rem;">
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.1);">
+      <h2 style="color:#e2e8f0;font-size:1.4rem;margin:0;">📊 Dashboard — DATA PREVISION</h2>
+      <button onclick="closeDashboard()" style="
+        background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);
+        color:#f87171;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;
+      ">✕ Fermer</button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div id="stats-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+      <div class="stat-card" style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:12px;padding:1.2rem;text-align:center;">
+        <div style="font-size:2rem;font-weight:700;color:#38bdf8;" id="total-requests">—</div>
+        <div style="color:#94a3b8;font-size:0.85rem;margin-top:4px;">Total Demandes</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div id="charts-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:2rem;">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.2rem;">
+        <h3 style="color:#e2e8f0;margin:0 0 1rem;font-size:0.95rem;">📈 Évolution des demandes</h3>
+        <div style="position:relative;height:260px;">
+          <canvas id="chart-timeline"></canvas>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.2rem;">
+        <h3 style="color:#e2e8f0;margin:0 0 1rem;font-size:0.95rem;">🥧 Répartition par service</h3>
+        <div style="position:relative;height:260px;">
+          <canvas id="chart-services"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;">
+      <div style="padding:1rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="color:#e2e8f0;margin:0;font-size:1rem;">📋 Toutes les Demandes</h3>
+        <button onclick="loadDashboard()" style="
+          background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);
+          color:#38bdf8;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;
+        ">🔄 Actualiser</button>
+      </div>
+      <div id="dashboard-loading" style="padding:3rem;text-align:center;color:#94a3b8;">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem;">⏳</div>
+        Chargement des données...
+      </div>
+      <div id="dashboard-table" style="display:none;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:rgba(255,255,255,0.05);">
+              <th style="padding:10px 14px;text-align:left;color:#94a3b8;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08);">Date</th>
+              <th style="padding:10px 14px;text-align:left;color:#94a3b8;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08);">Nom</th>
+              <th style="padding:10px 14px;text-align:left;color:#94a3b8;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08);">Email</th>
+              <th style="padding:10px 14px;text-align:left;color:#94a3b8;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08);">Service</th>
+              <th style="padding:10px 14px;text-align:left;color:#94a3b8;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08);">Message</th>
+            </tr>
+          </thead>
+          <tbody id="requests-tbody"></tbody>
+        </table>
+      </div>
+      <div id="dashboard-empty" style="display:none;padding:3rem;text-align:center;color:#94a3b8;">
+        Aucune demande pour le moment.
+      </div>
+      <div id="dashboard-error" style="display:none;padding:3rem;text-align:center;color:#f87171;">
+        ❌ Erreur de chargement. Vérifiez votre Apps Script URL.
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── HERO ── -->
 <section id="hero">
@@ -1124,6 +1236,198 @@ document.addEventListener('keydown', e => {
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').style.background =
     window.scrollY > 50 ? 'rgba(7,15,30,.97)' : 'rgba(7,15,30,.8)';
+});
+
+/* ─── ADMIN DASHBOARD ─── */
+const ADMIN_PASSWORD = 'dataprevision2026';
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbzSZpZXZoOdqHEZOumjzoEPkHSZ1ZvfFm0jka_SBVuWhqVBDv41Py3TA8us6XaWZnDkIQ/exec';
+
+function showAdminLogin() {
+  const modal = document.getElementById('admin-modal');
+  modal.style.display = 'flex';
+  document.getElementById('admin-pwd').value = '';
+  document.getElementById('admin-error').style.display = 'none';
+  setTimeout(() => document.getElementById('admin-pwd').focus(), 100);
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-modal').style.display = 'none';
+}
+
+function checkAdminPwd() {
+  const pwd = document.getElementById('admin-pwd').value;
+  if (pwd === ADMIN_PASSWORD) {
+    closeAdminModal();
+    openDashboard();
+  } else {
+    document.getElementById('admin-error').style.display = 'block';
+    document.getElementById('admin-pwd').value = '';
+    document.getElementById('admin-pwd').focus();
+  }
+}
+
+function openDashboard() {
+  document.getElementById('admin-dashboard').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  loadDashboard();
+}
+
+function closeDashboard() {
+  document.getElementById('admin-dashboard').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+let timelineChart = null;
+let servicesChart = null;
+
+const CHART_COLORS = ['#38bdf8','#818cf8','#34d399','#fbbf24','#f472b6','#a78bfa','#fb923c','#4ade80','#f87171','#22d3ee'];
+
+function loadDashboard() {
+  // Reset state
+  document.getElementById('dashboard-loading').style.display = 'block';
+  document.getElementById('dashboard-table').style.display = 'none';
+  document.getElementById('dashboard-empty').style.display = 'none';
+  document.getElementById('dashboard-error').style.display = 'none';
+  document.getElementById('total-requests').textContent = '—';
+
+  fetch(SHEET_API + '?action=getData', { method: 'GET', mode: 'cors' })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('dashboard-loading').style.display = 'none';
+      const rows = data.rows || [];
+      if (rows.length === 0) {
+        document.getElementById('dashboard-empty').style.display = 'block';
+        document.getElementById('total-requests').textContent = '0';
+        renderTimelineChart([]);
+        renderServicesChart({});
+        return;
+      }
+      // Stats
+      document.getElementById('total-requests').textContent = rows.length;
+
+      // Service breakdown (for chart)
+      const svcCount = {};
+      rows.forEach(r => {
+        const s = r[3] || 'Non spécifié';
+        svcCount[s] = (svcCount[s] || 0) + 1;
+      });
+
+      // Charts
+      renderTimelineChart(rows);
+      renderServicesChart(svcCount);
+
+      // Table
+      const tbody = document.getElementById('requests-tbody');
+      tbody.innerHTML = '';
+      [...rows].reverse().forEach((row, i) => {
+        const tr = document.createElement('tr');
+        tr.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.05);transition:background .15s;';
+        tr.onmouseover = () => tr.style.background = 'rgba(255,255,255,0.04)';
+        tr.onmouseout = () => tr.style.background = 'transparent';
+        const cols = [row[0]||'—', row[1]||'—', row[2]||'—', row[3]||'—', row[4]||'—'];
+        cols.forEach((val, ci) => {
+          const td = document.createElement('td');
+          td.style.cssText = 'padding:10px 14px;color:' + (ci===0?'#94a3b8':ci===4?'#94a3b8':'#e2e8f0') + ';max-width:' + (ci===4?'300px':'180px') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+          td.title = val;
+          td.textContent = val;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('dashboard-table').style.display = 'block';
+    })
+    .catch(() => {
+      document.getElementById('dashboard-loading').style.display = 'none';
+      document.getElementById('dashboard-error').style.display = 'block';
+    });
+}
+
+// Group requests by week (ISO-ish label) and render a line chart of the evolution
+function renderTimelineChart(rows) {
+  const ctx = document.getElementById('chart-timeline');
+  if (!ctx) return;
+
+  const counts = {};
+  rows.forEach(r => {
+    const d = new Date(r[0]);
+    if (isNaN(d)) return;
+    // Monday of that week, as a stable weekly bucket
+    const monday = new Date(d);
+    const day = (monday.getDay() + 6) % 7;
+    monday.setDate(monday.getDate() - day);
+    const key = monday.toISOString().slice(0, 10);
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const labels = Object.keys(counts).sort();
+  const values = labels.map(k => counts[k]);
+  const displayLabels = labels.map(k => {
+    const d = new Date(k);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  });
+
+  if (timelineChart) timelineChart.destroy();
+  timelineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: displayLabels,
+      datasets: [{
+        label: 'Demandes / semaine',
+        data: values,
+        borderColor: '#38bdf8',
+        backgroundColor: 'rgba(56,189,248,0.15)',
+        tension: 0.35,
+        fill: true,
+        pointBackgroundColor: '#38bdf8',
+        pointRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { beginAtZero: true, ticks: { color: '#94a3b8', precision: 0 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+      }
+    }
+  });
+}
+
+// Doughnut chart of requests broken down by service
+function renderServicesChart(svcCount) {
+  const ctx = document.getElementById('chart-services');
+  if (!ctx) return;
+
+  const labels = Object.keys(svcCount);
+  const values = Object.values(svcCount);
+
+  if (servicesChart) servicesChart.destroy();
+  servicesChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: labels.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
+        borderColor: '#07101e',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// Close modal on backdrop click
+document.getElementById('admin-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAdminModal();
 });
 </script>
 
