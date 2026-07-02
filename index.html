@@ -339,14 +339,59 @@ nav {
   transition:border-color .3s, transform .3s, box-shadow .3s;
   cursor:pointer;
 }
+.srv-card:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.srv-more {
+  margin-top:1rem; font-size:.78rem; font-weight:700; letter-spacing:.04em;
+  color: var(--accent); display:flex; align-items:center; gap:.35rem;
+}
+.srv-more svg { transition:transform .25s; }
+.srv-card:hover .srv-more svg { transform:translateX(4px); }
+
+/* ── SERVICE DETAIL MODAL ── */
+.srv-modal-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(4,9,20,.72);
+  backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center;
+  padding:1.5rem;
+  opacity:0; transition:opacity .25s;
+}
+.srv-modal-overlay.open { display:flex; opacity:1; }
+.srv-modal {
+  position:relative;
+  width:100%; max-width:640px; max-height:85vh; overflow-y:auto;
+  background:linear-gradient(160deg, #0d2547, #081a33);
+  border:1px solid rgba(56,189,248,.25);
+  border-radius:18px; padding:2.6rem 2.4rem;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+  transform:translateY(16px) scale(.98); transition:transform .3s;
+}
+.srv-modal-overlay.open .srv-modal { transform:translateY(0) scale(1); }
+.srv-modal-close {
+  position:absolute; top:1.1rem; right:1.1rem;
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(255,255,255,.06); border:1px solid var(--border);
+  color:var(--white); font-size:1.1rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s;
+}
+.srv-modal-close:hover { background:rgba(255,255,255,.14); }
+.srv-modal-img {
+  width:100%; height:180px; object-fit:cover; border-radius:12px;
+  margin-bottom:1.5rem; border:1px solid var(--border);
+}
+.srv-modal-num { font-size:.72rem; letter-spacing:.15em; color:var(--accent); font-weight:700; margin-bottom:.6rem; }
+.srv-modal-title { font-family:'Playfair Display'; font-size:1.6rem; font-weight:700; color:var(--white); margin-bottom:1rem; }
+.srv-modal-desc { font-size:.95rem; color:var(--text); line-height:1.85; white-space:pre-line; }
+.srv-modal-cta {
+  margin-top:1.8rem; display:inline-flex; align-items:center; gap:.5rem;
+  padding:.8rem 1.5rem; border-radius:9px; text-decoration:none;
+  background:linear-gradient(135deg, var(--mid), var(--bright));
+  color:#fff; font-weight:700; font-size:.85rem; cursor:pointer; border:none;
+}
 .srv-card:hover {
   border-color:rgba(56,189,248,.32); transform:translateY(-4px);
   box-shadow:0 12px 40px rgba(56,189,248,.1);
-}
-.srv-card:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
-.srv-card.active {
-  border-color:rgba(56,189,248,.55);
-  box-shadow:0 18px 50px rgba(56,189,248,.14);
 }
 .srv-img {
   width:100%; height:160px; object-fit:cover;
@@ -363,36 +408,6 @@ nav {
 }
 .srv-title { font-size:1.02rem; font-weight:700; color: var(--white); margin-bottom:.6rem; }
 .srv-desc { font-size:.875rem; color: var(--muted); line-height:1.75; }
-.srv-more { display:grid; grid-template-rows:0fr; transition:grid-template-rows .28s ease, margin-top .28s ease; }
-.srv-more > div { overflow:hidden; }
-.srv-card.active .srv-more { grid-template-rows:1fr; margin-top:1rem; }
-.srv-more-text {
-  border-top:1px solid var(--border);
-  padding-top:1rem;
-  font-size:.84rem;
-  color:#cbd5e1;
-  line-height:1.75;
-}
-.srv-action {
-  margin-top:1rem;
-  display:inline-flex;
-  align-items:center;
-  gap:.45rem;
-  color:var(--accent);
-  font-size:.78rem;
-  font-weight:700;
-}
-.srv-action::after {
-  content:"+";
-  width:18px;
-  height:18px;
-  border:1px solid rgba(56,189,248,.35);
-  border-radius:50%;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-.srv-card.active .srv-action::after { content:"-"; }
 
 /* ── CONTACT ── */
 #contact {
@@ -722,7 +737,7 @@ footer {
 
       <div class="id-card reveal reveal-delay-1 visible">
           <div class="id-card-title" data-i18n="vc3_lbl">Services</div>
-          <div class="id-metric">8<sub>+</sub></div>
+          <div class="id-metric">6<sub>+</sub></div>
           <div class="id-metric-label" data-i18n="vc3_sub">Core offerings</div>
         </div>
     </div>
@@ -760,73 +775,77 @@ footer {
     <div class="eyebrow reveal visible" data-i18n="srv_eyebrow">What We Do</div>
     <h2 class="section-title reveal visible" data-i18n="srv_title">Our Services</h2>
     <div class="services-grid">
-      <div class="srv-card reveal reveal-delay-1 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
+      <div class="srv-card reveal reveal-delay-1 visible" onclick="openServiceModal('s1')" tabindex="0" role="button">
         <img class="srv-img" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop&q=80" alt="Statistical Investigations" loading="lazy">
         <div class="srv-num">01</div>
         <div class="srv-title" data-i18n="s1_name">Statistical Investigations</div>
         <div class="srv-desc" data-i18n="s1_desc">Design and implement tailored surveys with rigorous methodology and full documentation — from questionnaire design to final analysis.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s1_more">We define the objective, build the questionnaire, choose the sample, organize the fieldwork and deliver a clear report with results you can defend.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-2 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
-        <img class="srv-img" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&auto=format&fit=crop&q=80" alt="Data Processing" loading="lazy">
+      <div class="srv-card reveal reveal-delay-2 visible" onclick="openServiceModal('s2')" tabindex="0" role="button">
+        <img class="srv-img" src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&auto=format&fit=crop&q=80" alt="Data Processing" loading="lazy">
         <div class="srv-num">02</div>
         <div class="srv-title" data-i18n="s2_name">Data Processing</div>
-        <div class="srv-desc" data-i18n="s2_desc">Cleaning, coding, checking and preparing your raw data so it becomes reliable, organized and ready for analysis.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s2_more">We correct inconsistencies, remove duplicates, handle missing values, structure variables and prepare Excel, SPSS or database files for serious statistical work.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-desc" data-i18n="s2_desc">Cleaning, coding, structuring, and statistical processing of your raw data — turning messy files into a rigorous, analysis-ready dataset.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-3 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
+      <div class="srv-card reveal reveal-delay-3 visible" onclick="openServiceModal('s3')" tabindex="0" role="button">
         <img class="srv-img" src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&auto=format&fit=crop&q=80" alt="Data Collection" loading="lazy">
         <div class="srv-num">03</div>
         <div class="srv-title" data-i18n="s3_name">Data Collection</div>
-        <div class="srv-desc" data-i18n="s3_desc">Reliable, validated data gathering through structured field surveys and carefully selected secondary sources.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s3_more">We collect data from questionnaires, interviews, administrative files or public sources, then verify quality so the information is usable and trustworthy.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-desc" data-i18n="s3_desc">Reliable, validated data gathering through structured field surveys and curated secondary sources, ensuring clean and usable datasets.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-1 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
+      <div class="srv-card reveal reveal-delay-1 visible" onclick="openServiceModal('s4')" tabindex="0" role="button">
         <img class="srv-img" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80" alt="Reporting Dashboards" loading="lazy">
         <div class="srv-num">04</div>
         <div class="srv-title" data-i18n="s4_name">Reporting Dashboards</div>
-        <div class="srv-desc" data-i18n="s4_desc">Clear, visual statistical dashboards built for decision-makers, with indicators that are easy to read.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s4_more">We create dashboards for activity, sales, finance, health or research indicators, so your team can follow results without reading long tables.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-desc" data-i18n="s4_desc">Clear, visual statistical dashboards built for decision-makers — turning complex outputs into actionable insight at a glance.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-2 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
+      <div class="srv-card reveal reveal-delay-2 visible" onclick="openServiceModal('s5')" tabindex="0" role="button">
         <img class="srv-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80" alt="Market Research" loading="lazy">
         <div class="srv-num">05</div>
         <div class="srv-title" data-i18n="s5_name">Market Research</div>
-        <div class="srv-desc" data-i18n="s5_desc">Market studies covering competition, customer expectations, prices, demand and local opportunities.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s5_more">We help you understand whether a project, product or location has demand, who the competitors are and what customers actually need.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-desc" data-i18n="s5_desc">Comprehensive market studies covering competitive landscapes, customer expectations, and demand forecasting for local economic actors.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-3 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
+      <div class="srv-card reveal reveal-delay-3 visible" onclick="openServiceModal('s6')" tabindex="0" role="button">
         <img class="srv-img" src="https://images.unsplash.com/photo-1543286386-713bdd548da4?w=800&auto=format&fit=crop&q=80" alt="Advanced Statistical Analysis" loading="lazy">
         <div class="srv-num">06</div>
         <div class="srv-title" data-i18n="s6_name">Advanced Statistical Analysis</div>
-        <div class="srv-desc" data-i18n="s6_desc">From descriptive statistics to regression, hypothesis testing and multivariate modeling.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s6_more">We analyze your data, choose the right statistical method, interpret the results and explain what the numbers mean for your decision.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-desc" data-i18n="s6_desc">From descriptive statistics to advanced regression and multivariate modeling — both quantitative and qualitative approaches available.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-1 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
+      <div class="srv-card reveal reveal-delay-1 visible" onclick="openServiceModal('s7')" tabindex="0" role="button">
         <img class="srv-img" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80" alt="Forecasting &amp; Prevision" loading="lazy">
         <div class="srv-num">07</div>
         <div class="srv-title" data-i18n="s7_name">Forecasting &amp; Prevision</div>
-        <div class="srv-desc" data-i18n="s7_desc">Predictive models and trend analyses that give your organization a reliable view of what comes next.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s7_more">We study past trends and build forecasts for demand, sales, risks or activity, helping you plan with evidence instead of guessing.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-desc" data-i18n="s7_desc">Predictive models and trend analyses that give your organization a reliable view of what comes next — so plans are grounded in evidence.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
-      <div class="srv-card reveal reveal-delay-2 visible" role="button" tabindex="0" aria-expanded="false" onclick="toggleService(this)" onkeydown="serviceKey(event, this)">
-        <img class="srv-img" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&auto=format&fit=crop&q=80" alt="Training" loading="lazy">
+      <div class="srv-card reveal reveal-delay-2 visible" onclick="openServiceModal('s8')" tabindex="0" role="button">
+        <img class="srv-img" src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80" alt="Training" loading="lazy">
         <div class="srv-num">08</div>
-        <div class="srv-title" data-i18n="s8_name">Training</div>
-        <div class="srv-desc" data-i18n="s8_desc">Practical training in statistics, data tools and interpretation for students, researchers and professional teams.</div>
-        <div class="srv-more"><div class="srv-more-text" data-i18n="s8_more">We provide workshops on Excel, SPSS, R, survey methods, statistical analysis and dashboard reading, adapted to the level of your group.</div></div>
-        <div class="srv-action" data-service-action data-i18n="srv_more_label">Understand this service</div>
+        <div class="srv-title" data-i18n="s8_name">Trainings</div>
+        <div class="srv-desc" data-i18n="s8_desc">Hands-on workshops and courses in statistics, data analysis, and research methodology for teams, students, and researchers.</div>
+        <div class="srv-more" data-i18n="srv_more"><span>Learn more</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ── SERVICE DETAIL MODAL ── -->
+<div class="srv-modal-overlay" id="srv-modal-overlay" onclick="if(event.target===this) closeServiceModal()">
+  <div class="srv-modal">
+    <button class="srv-modal-close" onclick="closeServiceModal()" aria-label="Close">✕</button>
+    <img class="srv-modal-img" id="srv-modal-img" src="" alt="">
+    <div class="srv-modal-num" id="srv-modal-num"></div>
+    <div class="srv-modal-title" id="srv-modal-title"></div>
+    <div class="srv-modal-desc" id="srv-modal-desc"></div>
+    <button class="srv-modal-cta" id="srv-modal-cta" onclick="closeServiceModal(); goTo('contact');"></button>
+  </div>
+</div>
 
 <!-- ── CONTACT ── -->
 <section id="contact">
@@ -873,7 +892,7 @@ footer {
             <option value="s5" data-i18n="s5_name">Market Research</option>
             <option value="s6" data-i18n="s6_name">Advanced Statistical Analysis</option>
             <option value="s7" data-i18n="s7_name">Forecasting &amp; Prevision</option>
-            <option value="s8" data-i18n="s8_name">Training</option>
+            <option value="s8" data-i18n="s8_name">Trainings</option>
             <option value="other" data-i18n="f_srv_other">Other</option>
           </select>
         </div>
@@ -928,23 +947,23 @@ const T = {
     ac1_name:"Health & Research", ac1_desc:"Statistical support for hospitals, clinics, and researchers — case-control studies, cohort analysis, PhD survey design, and data interpretation.",
     ac2_name:"Industry & Enterprise", ac2_desc:"Market studies, financial data analysis, and performance dashboards for companies ranging from agri-food to heavy industry and international ports.",
     ac3_name:"Public Institutions", ac3_desc:"Quantitative support for universities, banks, insurance companies, and local administrations seeking evidence-based reporting and planning.",
-    srv_eyebrow:"What We Do", srv_title:"Our Services", srv_more_label:"Understand this service", srv_less_label:"Close details",
+    srv_eyebrow:"What We Do", srv_title:"Our Services", srv_more:"Learn more", srv_cta:"Request this service",
     s1_name:"Statistical Investigations", s1_desc:"Design and implement tailored surveys with rigorous methodology and full documentation — from questionnaire design to final analysis.",
-    s1_more:"We define the objective, build the questionnaire, choose the sample, organize the fieldwork and deliver a clear report with results you can defend.",
-    s2_name:"Data Processing", s2_desc:"Cleaning, coding, checking and preparing your raw data so it becomes reliable, organized and ready for analysis.",
-    s2_more:"We correct inconsistencies, remove duplicates, handle missing values, structure variables and prepare Excel, SPSS or database files for serious statistical work.",
-    s3_name:"Data Collection", s3_desc:"Reliable, validated data gathering through structured field surveys and carefully selected secondary sources.",
-    s3_more:"We collect data from questionnaires, interviews, administrative files or public sources, then verify quality so the information is usable and trustworthy.",
-    s4_name:"Reporting Dashboards", s4_desc:"Clear, visual statistical dashboards built for decision-makers, with indicators that are easy to read.",
-    s4_more:"We create dashboards for activity, sales, finance, health or research indicators, so your team can follow results without reading long tables.",
-    s5_name:"Market Research", s5_desc:"Market studies covering competition, customer expectations, prices, demand and local opportunities.",
-    s5_more:"We help you understand whether a project, product or location has demand, who the competitors are and what customers actually need.",
-    s6_name:"Advanced Statistical Analysis", s6_desc:"From descriptive statistics to regression, hypothesis testing and multivariate modeling.",
-    s6_more:"We analyze your data, choose the right statistical method, interpret the results and explain what the numbers mean for your decision.",
-    s7_name:"Forecasting & Prevision", s7_desc:"Predictive models and trend analyses that give your organization a reliable view of what comes next.",
-    s7_more:"We study past trends and build forecasts for demand, sales, risks or activity, helping you plan with evidence instead of guessing.",
-    s8_name:"Training", s8_desc:"Practical training in statistics, data tools and interpretation for students, researchers and professional teams.",
-    s8_more:"We provide workshops on Excel, SPSS, R, survey methods, statistical analysis and dashboard reading, adapted to the level of your group.",
+    s1_long:"We design statistical investigations from the ground up: defining objectives, building the sampling plan, drafting and testing the questionnaire, coordinating fieldwork, and delivering a fully documented final report. Every step follows recognized scientific standards so your results are credible, reproducible, and ready to support real decisions — for hospitals, universities, companies, or public institutions.",
+    s2_name:"Data Processing", s2_desc:"Cleaning, coding, structuring, and statistical processing of your raw data — turning messy files into a rigorous, analysis-ready dataset.",
+    s2_long:"Raw data — survey exports, spreadsheets, scanned forms, administrative records — is rarely usable as-is. We clean, code, structure, and validate your data: removing errors and duplicates, handling missing values, standardizing variables, and organizing everything into a clean, well-documented dataset ready for statistical analysis or reporting.",
+    s3_name:"Data Collection", s3_desc:"Reliable, validated data gathering through structured field surveys and curated secondary sources, ensuring clean and usable datasets.",
+    s3_long:"We organize reliable data collection through structured field surveys, interviews, or trusted secondary sources. Enumerators are trained, tools are tested beforehand, and every entry is checked for consistency — so the data you receive is clean, well-documented, and ready to use with confidence.",
+    s4_name:"Reporting Dashboards", s4_desc:"Clear, visual statistical dashboards built for decision-makers — turning complex outputs into actionable insight at a glance.",
+    s4_long:"We turn dense statistical output into clear, visual dashboards built for decision-makers. Key indicators, trends, and comparisons are presented in an intuitive layout — so leadership teams can grasp the situation at a glance and act on it, without needing a statistics background.",
+    s5_name:"Market Research", s5_desc:"Comprehensive market studies covering competitive landscapes, customer expectations, and demand forecasting for local economic actors.",
+    s5_long:"Our market studies cover the competitive landscape, customer expectations, pricing sensitivity, and demand forecasts for your sector. Combining field surveys with secondary research, we give local businesses and institutions the evidence they need to launch products, enter new markets, or refine their strategy.",
+    s6_name:"Advanced Statistical Analysis", s6_desc:"From descriptive statistics to advanced regression and multivariate modeling — both quantitative and qualitative approaches available.",
+    s6_long:"From descriptive statistics to regression, multivariate modeling, and hypothesis testing, we apply the right analytical method to your research question — quantitative or qualitative. This service is especially suited to PhD theses, clinical studies, and academic research requiring methodological rigor.",
+    s7_name:"Forecasting & Prevision", s7_desc:"Predictive models and trend analyses that give your organization a reliable view of what comes next — so plans are grounded in evidence.",
+    s7_long:"We build predictive models and trend analyses — time series, demand forecasting, risk projections — so your organization can plan with a reliable view of what's coming. Every forecast is grounded in your historical data and validated so plans are built on evidence, not guesswork.",
+    s8_name:"Trainings", s8_desc:"Hands-on workshops and courses in statistics, data analysis, and research methodology for teams, students, and researchers.",
+    s8_long:"We deliver hands-on training in statistics, data analysis, and research methodology — tailored for company teams, university students, or researchers preparing a thesis. Sessions combine theory with practical exercises on real data, and can be delivered on-site or remotely, in groups or one-on-one.",
     ct_eyebrow:"Get in Touch", ct_title:"Start a Conversation",
     ct_loc:"Location", ct_email:"Email", ct_phone:"Phone", ct_conf:"Confidentiality", ct_conf_v:"All enquiries handled discreetly",
     f_name:"Your Name", f_name_ph:"Institution or full name", f_email:"Email", f_srv:"Service Needed", f_srv_ph:"e.g. Market study, PhD analysis…", f_srv_choose:"Select a service…", f_srv_other:"Other", f_msg:"Message", f_msg_ph:"Tell us about your project…", f_send:"Send Message",
@@ -971,23 +990,23 @@ const T = {
     ac1_name:"Santé & Recherche", ac1_desc:"Appui statistique pour hôpitaux, cliniques et chercheurs — études cas-témoins, analyses de cohortes, conception d'enquêtes pour thèses et interprétation des données.",
     ac2_name:"Industrie & Entreprise", ac2_desc:"Études de marché, analyse de données financières et tableaux de bord pour des entreprises allant de l'agroalimentaire à l'industrie lourde et aux ports internationaux.",
     ac3_name:"Institutions Publiques", ac3_desc:"Accompagnement quantitatif pour universités, banques, assurances et administrations locales cherchant des rapports et une planification fondés sur des preuves.",
-    srv_eyebrow:"Ce Que Nous Faisons", srv_title:"Nos Services", srv_more_label:"Comprendre ce service", srv_less_label:"Fermer les détails",
+    srv_eyebrow:"Ce Que Nous Faisons", srv_title:"Nos Services", srv_more:"En savoir plus", srv_cta:"Demander ce service",
     s1_name:"Enquêtes Statistiques", s1_desc:"Concevoir et mettre en œuvre des enquêtes sur mesure avec une méthodologie rigoureuse et une documentation complète.",
-    s1_more:"Nous définissons l'objectif, construisons le questionnaire, choisissons l'échantillon, organisons le terrain et livrons un rapport clair avec des résultats défendables.",
-    s2_name:"Traitement des Données", s2_desc:"Nettoyage, codage, contrôle et préparation de vos données brutes pour les rendre fiables, organisées et prêtes à analyser.",
-    s2_more:"Nous corrigeons les incohérences, supprimons les doublons, traitons les valeurs manquantes, structurons les variables et préparons les fichiers Excel, SPSS ou bases de données.",
+    s1_long:"Nous concevons vos enquêtes statistiques de bout en bout : définition des objectifs, plan d'échantillonnage, élaboration et test du questionnaire, coordination du terrain, puis rapport final entièrement documenté. Chaque étape respecte des standards scientifiques reconnus, pour des résultats crédibles, reproductibles et directement exploitables — pour hôpitaux, universités, entreprises ou organismes publics.",
+    s2_name:"Traitement des Données", s2_desc:"Nettoyage, codification, structuration et traitement statistique de vos données brutes pour obtenir un jeu de données propre et exploitable.",
+    s2_long:"Des données brutes — exports d'enquêtes, fichiers Excel, formulaires scannés, registres administratifs — sont rarement utilisables telles quelles. Nous les nettoyons, les codifions, les structurons et les validons : correction des erreurs et doublons, traitement des valeurs manquantes, standardisation des variables, et organisation en un jeu de données propre, documenté et prêt pour l'analyse ou le reporting.",
     s3_name:"Collecte de Données", s3_desc:"Collecte fiable et validée via des enquêtes terrain structurées et des sources secondaires soigneusement sélectionnées.",
-    s3_more:"Nous collectons les données par questionnaires, entretiens, fichiers administratifs ou sources publiques, puis nous vérifions leur qualité.",
-    s4_name:"Tableaux de Bord", s4_desc:"Tableaux de bord statistiques clairs pour les décideurs, avec des indicateurs faciles à lire.",
-    s4_more:"Nous créons des tableaux de bord pour l'activité, les ventes, la finance, la santé ou la recherche, afin de suivre les résultats sans lire de longs tableaux.",
-    s5_name:"Étude de Marché", s5_desc:"Études de marché couvrant la concurrence, les attentes clients, les prix, la demande et les opportunités locales.",
-    s5_more:"Nous vous aidons à savoir si un projet, produit ou emplacement a une vraie demande, qui sont les concurrents et ce que les clients recherchent.",
-    s6_name:"Analyses Statistiques Avancées", s6_desc:"De la statistique descriptive à la régression, aux tests d'hypothèses et à la modélisation multivariée.",
-    s6_more:"Nous analysons vos données, choisissons la bonne méthode statistique, interprétons les résultats et expliquons ce que les chiffres signifient pour votre décision.",
-    s7_name:"Prévision & Forecasting", s7_desc:"Modèles prédictifs et analyses de tendances donnant à votre organisation une vision fiable de ce qui vient.",
-    s7_more:"Nous étudions les tendances passées et construisons des prévisions de demande, ventes, risques ou activité pour planifier sur des preuves.",
-    s8_name:"Formations", s8_desc:"Formations pratiques en statistiques, outils de données et interprétation pour étudiants, chercheurs et équipes professionnelles.",
-    s8_more:"Nous proposons des ateliers sur Excel, SPSS, R, les méthodes d'enquête, l'analyse statistique et la lecture de tableaux de bord, adaptés au niveau du groupe.",
+    s3_long:"Nous organisons une collecte de données fiable via des enquêtes de terrain structurées, des entretiens ou des sources secondaires de confiance. Les enquêteurs sont formés, les outils testés au préalable, et chaque saisie est contrôlée pour sa cohérence — pour des données propres, documentées et exploitables en toute confiance.",
+    s4_name:"Tableaux de Bord", s4_desc:"Tableaux de bord statistiques clairs pour les décideurs — transformant des résultats complexes en informations exploitables.",
+    s4_long:"Nous transformons des résultats statistiques denses en tableaux de bord visuels et clairs, pensés pour les décideurs. Indicateurs clés, tendances et comparaisons sont présentés dans une mise en page intuitive — pour que les équipes de direction saisissent la situation d'un coup d'œil et agissent, sans besoin de bagage statistique.",
+    s5_name:"Étude de Marché", s5_desc:"Études de marché complètes couvrant les paysages concurrentiels, les attentes clients et la prévision de la demande.",
+    s5_long:"Nos études de marché couvrent le paysage concurrentiel, les attentes clients, la sensibilité au prix et les prévisions de demande de votre secteur. En combinant enquêtes terrain et recherche documentaire, nous donnons aux entreprises et institutions locales les preuves nécessaires pour lancer un produit, entrer sur un nouveau marché ou affiner leur stratégie.",
+    s6_name:"Analyses Statistiques Avancées", s6_desc:"De la statistique descriptive à la régression avancée et la modélisation multivariée — approches quantitatives et qualitatives disponibles.",
+    s6_long:"De la statistique descriptive à la régression, la modélisation multivariée et les tests d'hypothèses, nous appliquons la méthode d'analyse adaptée à votre question de recherche — quantitative ou qualitative. Ce service convient particulièrement aux thèses de doctorat, études cliniques et travaux académiques exigeant une rigueur méthodologique.",
+    s7_name:"Prévision & Forecasting", s7_desc:"Modèles prédictifs et analyses de tendances donnant à votre organisation une vision fiable de ce qui vient — pour des plans fondés sur des preuves.",
+    s7_long:"Nous construisons des modèles prédictifs et des analyses de tendances — séries temporelles, prévision de la demande, projections de risque — pour que votre organisation planifie avec une vision fiable de l'avenir. Chaque prévision s'appuie sur vos données historiques et est validée, pour des plans fondés sur des preuves, pas sur des suppositions.",
+    s8_name:"Formations", s8_desc:"Ateliers et formations pratiques en statistique, analyse de données et méthodologie de recherche pour équipes, étudiants et chercheurs.",
+    s8_long:"Nous dispensons des formations pratiques en statistique, analyse de données et méthodologie de recherche — adaptées aux équipes d'entreprise, étudiants universitaires ou chercheurs préparant une thèse. Les sessions combinent théorie et exercices pratiques sur données réelles, en présentiel ou à distance, en groupe ou en individuel.",
     ct_eyebrow:"Contactez-Nous", ct_title:"Démarrer une Conversation",
     ct_loc:"Localisation", ct_email:"Email", ct_phone:"Téléphone", ct_conf:"Confidentialité", ct_conf_v:"Toutes les demandes traitées discrètement",
     f_name:"Votre Nom", f_name_ph:"Institution ou nom complet", f_email:"Email", f_srv:"Service Souhaité", f_srv_ph:"ex : Étude de marché, analyse thèse…", f_srv_choose:"Choisissez un service…", f_srv_other:"Autre", f_msg:"Message", f_msg_ph:"Parlez-nous de votre projet…", f_send:"Envoyer",
@@ -1014,23 +1033,23 @@ const T = {
     ac1_name:"الصحة والبحث", ac1_desc:"دعم إحصائي للمستشفيات والعيادات والباحثين — دراسات الحالة والشواهد، تحليل الأفواج، تصميم استطلاعات الأطروحات، وتفسير البيانات.",
     ac2_name:"الصناعة والمؤسسات", ac2_desc:"دراسات السوق وتحليل البيانات المالية ولوحات الأداء للشركات من الصناعات الغذائية إلى الصناعة الثقيلة والموانئ الدولية.",
     ac3_name:"المؤسسات العامة", ac3_desc:"دعم كمي للجامعات والبنوك وشركات التأمين والإدارات المحلية الباحثة عن تقارير وتخطيط مبني على الأدلة.",
-    srv_eyebrow:"ما نقدمه", srv_title:"خدماتنا", srv_more_label:"فهم هذه الخدمة", srv_less_label:"إغلاق التفاصيل",
+    srv_eyebrow:"ما نقدمه", srv_title:"خدماتنا", srv_more:"اعرف المزيد", srv_cta:"اطلب هذه الخدمة",
     s1_name:"التحقيقات الإحصائية", s1_desc:"تصميم وتنفيذ استطلاعات مخصصة بمنهجية صارمة وتوثيق شامل — من تصميم الاستبيان إلى التحليل النهائي.",
-    s1_more:"نحدد الهدف، نبني الاستبيان، نختار العينة، ننظم العمل الميداني ونقدم تقريراً واضحاً بنتائج يمكن الاعتماد عليها.",
-    s2_name:"معالجة البيانات", s2_desc:"تنظيف وترميز ومراجعة وتحضير البيانات الخام حتى تصبح منظمة وموثوقة وجاهزة للتحليل.",
-    s2_more:"نصحح التناقضات، نحذف التكرار، نعالج القيم الناقصة، ننظم المتغيرات ونحضر ملفات Excel أو SPSS أو قواعد البيانات.",
-    s3_name:"جمع البيانات", s3_desc:"جمع بيانات موثوق ومُعتمد عبر استطلاعات ميدانية منظمة ومصادر ثانوية مختارة بعناية.",
-    s3_more:"نجمع البيانات عبر الاستبيانات، المقابلات، الملفات الإدارية أو المصادر العامة، ثم نتحقق من جودتها وقابليتها للاستخدام.",
-    s4_name:"لوحات التقارير", s4_desc:"لوحات إحصائية واضحة لصانعي القرار مع مؤشرات سهلة القراءة.",
-    s4_more:"ننشئ لوحات متابعة للنشاط، المبيعات، المالية، الصحة أو البحث حتى يتابع فريقك النتائج دون جداول طويلة.",
-    s5_name:"دراسة السوق", s5_desc:"دراسات سوقية تغطي المنافسة، توقعات الزبائن، الأسعار، الطلب والفرص المحلية.",
-    s5_more:"نساعدك على معرفة هل يوجد طلب حقيقي على مشروع أو منتج أو موقع، ومن هم المنافسون وما الذي يريده الزبائن.",
-    s6_name:"التحليل الإحصائي المتقدم", s6_desc:"من الإحصاء الوصفي إلى الانحدار واختبارات الفرضيات والنمذجة متعددة المتغيرات.",
-    s6_more:"نحلل بياناتك، نختار الطريقة الإحصائية المناسبة، نفسر النتائج ونوضح ماذا تعني الأرقام بالنسبة لقرارك.",
-    s7_name:"التنبؤ والاستشراف", s7_desc:"نماذج تنبؤية وتحليلات اتجاهات تمنح مؤسستك رؤية موثوقة لما هو قادم.",
-    s7_more:"ندرس الاتجاهات السابقة ونبني توقعات للطلب أو المبيعات أو المخاطر أو النشاط حتى يكون التخطيط مبنياً على أدلة.",
-    s8_name:"التكوين", s8_desc:"تكوينات تطبيقية في الإحصاء وأدوات البيانات وتفسير النتائج للطلبة والباحثين والفرق المهنية.",
-    s8_more:"نقدم ورشات في Excel وSPSS وR وطرق الاستبيان والتحليل الإحصائي وقراءة لوحات البيانات حسب مستوى المجموعة.",
+    s1_long:"نصمم استطلاعاتكم الإحصائية من الألف إلى الياء: تحديد الأهداف، بناء خطة المعاينة، إعداد واختبار الاستبيان، تنسيق العمل الميداني، وتسليم تقرير نهائي موثّق بالكامل. تتبع كل خطوة معايير علمية معترف بها لضمان نتائج موثوقة وقابلة للتكرار وجاهزة لدعم قرارات حقيقية — للمستشفيات والجامعات والشركات والمؤسسات العامة.",
+    s2_name:"معالجة البيانات", s2_desc:"تنظيف وترميز وهيكلة ومعالجة إحصائية لبياناتكم الخام — لتحويل الملفات غير المنظمة إلى قاعدة بيانات دقيقة وجاهزة للتحليل.",
+    s2_long:"نادرًا ما تكون البيانات الخام — نتائج الاستطلاعات، جداول البيانات، النماذج الممسوحة ضوئيًا، السجلات الإدارية — قابلة للاستخدام كما هي. نقوم بتنظيفها وترميزها وهيكلتها والتحقق منها: تصحيح الأخطاء والتكرارات، معالجة القيم المفقودة، توحيد المتغيرات، وتنظيم كل ذلك في قاعدة بيانات نظيفة وموثقة وجاهزة للتحليل الإحصائي أو إعداد التقارير.",
+    s3_name:"جمع البيانات", s3_desc:"جمع بيانات موثوق ومُعتمد عبر استطلاعات ميدانية منظمة ومصادر ثانوية مختارة بعناية لضمان بيانات نظيفة وقابلة للاستخدام.",
+    s3_long:"ننظم عملية جمع بيانات موثوقة عبر استطلاعات ميدانية منظمة، أو مقابلات، أو مصادر ثانوية موثوقة. يتم تدريب الباحثين الميدانيين، واختبار الأدوات مسبقًا، والتحقق من تناسق كل إدخال — لتصلكم بيانات نظيفة وموثقة وقابلة للاستخدام بثقة تامة.",
+    s4_name:"لوحات التقارير", s4_desc:"لوحات إحصائية مرئية وواضحة لصانعي القرار — تحويل النتائج المعقدة إلى رؤى قابلة للتنفيذ بلمحة واحدة.",
+    s4_long:"نحوّل النتائج الإحصائية المعقدة إلى لوحات بيانات مرئية وواضحة مصممة لصانعي القرار. تُعرض المؤشرات الرئيسية والاتجاهات والمقارنات في تصميم بديهي — ليتمكن فريق الإدارة من فهم الوضع بلمحة واحدة والتصرف بناءً عليه، دون الحاجة إلى خلفية إحصائية.",
+    s5_name:"دراسة السوق", s5_desc:"دراسات سوقية شاملة تغطي المشهد التنافسي وتوقعات العملاء وتوقع الطلب للفاعلين الاقتصاديين المحليين.",
+    s5_long:"تغطي دراسات السوق لدينا المشهد التنافسي وتوقعات العملاء وحساسية الأسعار وتوقعات الطلب في قطاعكم. من خلال الجمع بين الاستطلاعات الميدانية والبحث الثانوي، نمنح الشركات والمؤسسات المحلية الأدلة اللازمة لإطلاق منتج أو دخول سوق جديدة أو صقل استراتيجيتها.",
+    s6_name:"التحليل الإحصائي المتقدم", s6_desc:"من الإحصاء الوصفي إلى الانحدار المتقدم والنمذجة المتعددة المتغيرات — المقاربتان الكمية والنوعية متاحتان.",
+    s6_long:"من الإحصاء الوصفي إلى الانحدار والنمذجة متعددة المتغيرات واختبار الفرضيات، نطبق الطريقة التحليلية المناسبة لسؤال بحثكم — كميًا كان أم نوعيًا. تناسب هذه الخدمة بشكل خاص أطروحات الدكتوراه والدراسات السريرية والأبحاث الأكاديمية التي تتطلب صرامة منهجية.",
+    s7_name:"التنبؤ والاستشراف", s7_desc:"نماذج تنبؤية وتحليلات اتجاهات تمنح مؤسستك رؤية موثوقة لما هو قادم — حتى تكون خططك مبنية على أدلة.",
+    s7_long:"نبني نماذج تنبؤية وتحليلات اتجاهات — سلاسل زمنية، توقع الطلب، إسقاطات المخاطر — حتى تتمكن مؤسستكم من التخطيط برؤية موثوقة لما هو قادم. يستند كل تنبؤ إلى بياناتكم التاريخية ويتم التحقق منه، لخطط مبنية على أدلة لا على تخمين.",
+    s8_name:"التكوين والتدريب", s8_desc:"ورشات عمل ودورات تدريبية عملية في الإحصاء وتحليل البيانات ومنهجية البحث للفرق والطلاب والباحثين.",
+    s8_long:"نقدم تدريبات عملية في الإحصاء وتحليل البيانات ومنهجية البحث — مصممة لفرق الشركات أو طلاب الجامعات أو الباحثين الذين يعدون أطروحة. تجمع الجلسات بين النظرية والتمارين العملية على بيانات حقيقية، ويمكن تقديمها حضوريًا أو عن بُعد، جماعيًا أو فرديًا.",
     ct_eyebrow:"تواصل معنا", ct_title:"ابدأ محادثة",
     ct_loc:"الموقع", ct_email:"البريد الإلكتروني", ct_phone:"الهاتف", ct_conf:"السرية", ct_conf_v:"كل الاستفسارات تُعالج بسرية تامة",
     f_name:"اسمك", f_name_ph:"المؤسسة أو الاسم الكامل", f_email:"البريد الإلكتروني", f_srv:"الخدمة المطلوبة", f_srv_ph:"مثال: دراسة سوق، تحليل أطروحة…", f_srv_choose:"اختر خدمة…", f_srv_other:"أخرى", f_msg:"الرسالة", f_msg_ph:"أخبرنا عن مشروعك…", f_send:"إرسال",
@@ -1058,33 +1077,56 @@ function setLang(lang) {
     const k = el.dataset.i18nPh;
     if (t[k] !== undefined) el.placeholder = t[k];
   });
-  refreshServiceLabels();
-}
-
-function refreshServiceLabels() {
-  const t = T[currentLang] || T.en;
-  document.querySelectorAll('[data-service-action]').forEach(el => {
-    const card = el.closest('.srv-card');
-    el.textContent = card && card.classList.contains('active') ? t.srv_less_label : t.srv_more_label;
-  });
-}
-
-function toggleService(card) {
-  const isOpen = card.classList.toggle('active');
-  card.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-  refreshServiceLabels();
-}
-
-function serviceKey(event, card) {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault();
-    toggleService(card);
-  }
 }
 
 function goTo(id) {
   document.getElementById(id).scrollIntoView({ behavior:'smooth' });
 }
+
+/* ─── SERVICE DETAIL MODAL ─── */
+const SRV_IMAGES = {
+  s1: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&auto=format&fit=crop&q=80",
+  s2: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&auto=format&fit=crop&q=80",
+  s3: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1200&auto=format&fit=crop&q=80",
+  s4: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop&q=80",
+  s5: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&auto=format&fit=crop&q=80",
+  s6: "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=1200&auto=format&fit=crop&q=80",
+  s7: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&auto=format&fit=crop&q=80",
+  s8: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&auto=format&fit=crop&q=80"
+};
+const SRV_ORDER = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+
+function openServiceModal(id) {
+  const t = T[currentLang];
+  const overlay = document.getElementById('srv-modal-overlay');
+  document.getElementById('srv-modal-img').src = SRV_IMAGES[id] || '';
+  document.getElementById('srv-modal-img').alt = t[id + '_name'] || '';
+  const num = SRV_ORDER.indexOf(id) + 1;
+  document.getElementById('srv-modal-num').textContent = (num < 10 ? '0' + num : num);
+  document.getElementById('srv-modal-title').textContent = t[id + '_name'] || '';
+  document.getElementById('srv-modal-desc').textContent = t[id + '_long'] || t[id + '_desc'] || '';
+  document.getElementById('srv-modal-cta').textContent = t.srv_cta || 'Request this service';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  overlay.setAttribute('tabindex','-1');
+  overlay.focus();
+}
+
+function closeServiceModal() {
+  const overlay = document.getElementById('srv-modal-overlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeServiceModal();
+});
+
+document.querySelectorAll('.srv-card').forEach(card => {
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+  });
+});
 
 /* ─── GOOGLE SHEETS CONTACT FORM ─── */
 // Paste your Google Apps Script Web App URL below (see setup instructions)
