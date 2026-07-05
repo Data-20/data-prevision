@@ -551,11 +551,11 @@ nav {
 }
 .tr-card-head {
   display:flex; justify-content:space-between; align-items:baseline;
-  flex-wrap:wrap; gap:.5rem; margin-bottom:1.1rem;
+  flex-wrap:wrap; gap:.5rem; margin-bottom:1.1rem; direction:ltr;
 }
 .tr-card-service { font-weight:700; color: var(--white); font-size:1rem; }
 .tr-card-date { font-size:.78rem; color: var(--muted); }
-.tr-steps { display:flex; align-items:center; }
+.tr-steps { display:flex; align-items:center; direction:ltr; }
 .tr-step { display:flex; flex-direction:column; align-items:center; gap:.5rem; flex:1; position:relative; }
 .tr-step-dot {
   width:16px; height:16px; border-radius:50%;
@@ -1243,6 +1243,7 @@ function setLang(lang) {
     const k = el.dataset.i18nPh;
     if (t[k] !== undefined) el.placeholder = t[k];
   });
+  if (typeof renderTrackingState === 'function') renderTrackingState();
 }
 
 function goTo(id) {
@@ -1406,6 +1407,22 @@ const STATUS_MAP = {
   'finalisé': 3, 'finalise': 3, 'terminé': 3, 'termine': 3, 'completed': 3, 'done': 3, 'مكتمل': 3, 'منتهي': 3
 };
 
+// Remembers the last search result so the card can be re-rendered in the
+// correct language if the user switches language after checking status.
+let trTrackingState = null; // null | { type: 'rows', rows } | { type: 'empty' } | { type: 'error' }
+
+function renderTrackingState() {
+  const resultsEl = document.getElementById('tr-results');
+  if (!resultsEl || !trTrackingState) return;
+  if (trTrackingState.type === 'rows') {
+    resultsEl.innerHTML = trTrackingState.rows.map(renderTrackingCard).join('');
+  } else if (trTrackingState.type === 'empty') {
+    resultsEl.innerHTML = '<div class="tr-empty">' + T[currentLang].tr_empty + '</div>';
+  } else if (trTrackingState.type === 'error') {
+    resultsEl.innerHTML = '<div class="tr-error">' + T[currentLang].tr_error + '</div>';
+  }
+}
+
 function checkTrackingStatus() {
   const emailInput = document.getElementById('tr-email');
   const email = emailInput.value.trim();
@@ -1414,6 +1431,7 @@ function checkTrackingStatus() {
   const btn = document.getElementById('tr-submit');
 
   resultsEl.innerHTML = '';
+  trTrackingState = null;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showStatus(statusEl, 'error', {
@@ -1428,7 +1446,6 @@ function checkTrackingStatus() {
   btn.disabled = true;
   btn.style.opacity = '.7';
   const span = btn.querySelector('span');
-  const prevLabel = span.textContent;
   span.textContent = T[currentLang].tr_checking;
 
   fetch(SHEET_API + '?action=getStatus&email=' + encodeURIComponent(email), {
@@ -1438,14 +1455,12 @@ function checkTrackingStatus() {
   .then(r => r.json())
   .then(data => {
     const rows = (data && data.rows) || [];
-    if (rows.length === 0) {
-      resultsEl.innerHTML = '<div class="tr-empty">' + T[currentLang].tr_empty + '</div>';
-      return;
-    }
-    resultsEl.innerHTML = rows.map(renderTrackingCard).join('');
+    trTrackingState = rows.length === 0 ? { type: 'empty' } : { type: 'rows', rows: rows };
+    renderTrackingState();
   })
   .catch(() => {
-    resultsEl.innerHTML = '<div class="tr-error">' + T[currentLang].tr_error + '</div>';
+    trTrackingState = { type: 'error' };
+    renderTrackingState();
   })
   .finally(() => {
     btn.disabled = false;
@@ -1455,7 +1470,12 @@ function checkTrackingStatus() {
 }
 
 function renderTrackingCard(row) {
-  const date = row.date || '';
+  const rawDate = row.date || '';
+  const parsedDate = new Date(rawDate);
+  const locales = { en: 'en-GB', fr: 'fr-FR', ar: 'ar-DZ' };
+  const date = !isNaN(parsedDate)
+    ? parsedDate.toLocaleDateString(locales[currentLang] || 'fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : rawDate;
   const service = row.service || '—';
   const rawStatus = (row.status || '').toString().trim().toLowerCase();
   const stepIndex = STATUS_MAP.hasOwnProperty(rawStatus) ? STATUS_MAP[rawStatus] : 0;
