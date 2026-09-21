@@ -439,7 +439,7 @@ html[data-theme="light"] .identity-illustration .identity-illust-img {
   }
 }
 .eyebrow {
-  font-size:.72rem; letter-spacing:.22em; text-transform:uppercase;
+  font-size:1.05rem; letter-spacing:.18em; text-transform:uppercase;
   color: var(--accent); font-weight:700; margin-bottom:.9rem;
   display:flex; align-items:center; gap:.6rem;
 }
@@ -794,28 +794,40 @@ footer {
 
 /* ── FLOATING MATH SYMBOLS (σ μ χ²) ── */
 .math-symbols {
-  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;
+  /* stay above page background, below nav/modals */
 }
 .math-sym {
   position:absolute;
+  top:0; left:0;
   font-family:'Playfair Display', 'Times New Roman', serif;
   font-weight:700;
-  color: rgba(56,189,248,0.32);
-  text-shadow: 0 0 22px rgba(56,189,248,0.45);
-  animation: mathFloat linear infinite;
+  color: rgba(56,189,248,0.42);
+  text-shadow: 0 0 22px rgba(56,189,248,0.55);
+  animation-name: mathFloat;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
   user-select:none;
+  -webkit-user-select:none;
+  /* GPU layer — critical for iOS/Android */
+  -webkit-transform: translate3d(0, 100vh, 0);
+  transform: translate3d(0, 100vh, 0);
   will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  opacity: 0;
 }
 html[data-theme="light"] .math-sym {
-  color: rgba(19,86,168,0.18);
-  text-shadow: 0 0 14px rgba(19,86,168,0.2);
+  color: rgba(19,86,168,0.28);
+  text-shadow: 0 0 14px rgba(19,86,168,0.3);
 }
 @keyframes mathFloat {
-  0%   { transform: translateY(110vh) rotate(0deg) scale(0.7); opacity:0; }
-  8%   { opacity:0.9; }
-  50%  { opacity:0.55; }
-  92%  { opacity:0.25; }
-  100% { transform: translateY(-15vh) rotate(25deg) scale(1.15); opacity:0; }
+  0%   { -webkit-transform: translate3d(0, 105vh, 0) rotate(0deg) scale(0.7); transform: translate3d(0, 105vh, 0) rotate(0deg) scale(0.7); opacity:0; }
+  8%   { opacity:0.95; }
+  50%  { opacity:0.6; }
+  92%  { opacity:0.3; }
+  100% { -webkit-transform: translate3d(0, -20vh, 0) rotate(25deg) scale(1.15); transform: translate3d(0, -20vh, 0) rotate(25deg) scale(1.15); opacity:0; }
 }
 
 
@@ -884,12 +896,23 @@ html[data-theme="light"] .bg-orb.o3 {
 
 /* math symbols more present */
 .math-sym {
-  color: rgba(56,189,248,0.38) !important;
-  text-shadow: 0 0 28px rgba(56,189,248,0.55) !important;
+  color: rgba(56,189,248,0.45) !important;
+  text-shadow: 0 0 28px rgba(56,189,248,0.6) !important;
 }
 html[data-theme="light"] .math-sym {
-  color: rgba(19,86,168,0.22) !important;
-  text-shadow: 0 0 16px rgba(19,86,168,0.25) !important;
+  color: rgba(19,86,168,0.3) !important;
+  text-shadow: 0 0 16px rgba(19,86,168,0.3) !important;
+}
+/* Mobile: keep symbols visible while scrolling (above section backgrounds) */
+@media (max-width: 900px) {
+  .math-symbols { z-index: 2; }
+  .math-sym {
+    color: rgba(56,189,248,0.5) !important;
+    text-shadow: 0 0 20px rgba(56,189,248,0.65) !important;
+  }
+  html[data-theme="light"] .math-sym {
+    color: rgba(19,86,168,0.32) !important;
+  }
 }
 
 /* aurora band across hero */
@@ -1061,8 +1084,9 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
   <div class="nav-links">
     <a onclick="goTo('identity')" data-i18n="nav_who">Who we are?</a>
     <a onclick="goTo('about')" data-i18n="nav_about">Our mission</a>
-    <a onclick="goTo('services')" data-i18n="nav_services">Our services</a>
-    <a onclick="goTo('contact')" data-i18n="nav_contact">Contact</a>
+    <a onclick="goTo('services')" data-i18n="nav_services">What we do?</a>
+    <a onclick="goTo('tracking')" data-i18n="nav_tracking">File tracking</a>
+    <a onclick="goTo('contact')" data-i18n="nav_contact">Contact us</a>
   </div>
 
   <div class="lang-switcher">
@@ -1289,7 +1313,7 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
 <!-- ── SERVICES ── -->
 <section id="services">
   <div class="services-inner">
-    <div class="eyebrow reveal visible" data-i18n="srv_eyebrow">What we do</div>
+    <div class="eyebrow reveal visible" data-i18n="srv_eyebrow">What we do?</div>
     <h2 class="section-title reveal visible" data-i18n="srv_title">Our services</h2>
     <div class="services-grid">
       <div class="srv-card reveal reveal-delay-1 visible" onclick="openServiceModal('s1')" tabindex="0" role="button">
@@ -1467,7 +1491,7 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
 /* ─── TRANSLATIONS ─── */
 const T = {
   en: {
-    nav_who:"Who we are?", nav_about:"Our mission", nav_services:"Our services", nav_tracking:"Track my file", nav_contact:"Contact",
+    nav_who:"Who we are?", nav_about:"Our mission", nav_services:"What we do?", nav_tracking:"File tracking", nav_contact:"Contact us",
     tr_eyebrow:"File tracking", tr_title:"Track your file", tr_sub:"Enter the email you used when submitting your request to view its current status.", tr_email_ph:"your@email.com", tr_check:"Check status", tr_checking:"Checking…",
     tr_step_received:"Received", tr_step_progress:"In progress", tr_step_analysis:"Analysis", tr_step_done:"Completed",
     tr_empty:"No request was found for this email. Please check your entry or contact us directly.",
@@ -1492,7 +1516,7 @@ const T = {
     ac1_name:"Health & research", ac1_desc:"Statistical support for hospitals, clinics and researchers — case-control studies, cohort analysis, survey design for theses, and data interpretation.",
     ac2_name:"Industry & business", ac2_desc:"Market studies, financial data analysis and performance dashboards for companies from agri-food to heavy industry and international ports.",
     ac3_name:"Public institutions", ac3_desc:"Quantitative support for universities, banks, insurance companies and local administrations seeking evidence-based reports and planning.",
-    srv_eyebrow:"What we do", srv_title:"Our services", srv_more:"Learn more", srv_cta:"Request this service",
+    srv_eyebrow:"What we do?", srv_title:"Our services", srv_more:"Learn more", srv_cta:"Request this service",
     s1_name:"Statistical surveys", s1_desc:"Design and run custom surveys with rigorous methodology and full documentation — from questionnaire design to final analysis.",
     s1_long:"We design your statistical surveys end to end: defining objectives, sampling plan, questionnaire design and testing, field coordination, and a fully documented final report. Every step follows recognised scientific standards so results are credible, reproducible and ready to support real decisions — for hospitals, universities, companies or public bodies.",
     s2_name:"Data processing", s2_desc:"Cleaning, coding, structuring and statistical processing of your raw data into a clean, analysis-ready dataset.",
@@ -1516,7 +1540,7 @@ const T = {
     edit_hint:"✏️ Click highlighted text to edit."
   },
   fr: {
-    nav_who:"Qui sommes-nous?", nav_about:"Notre mission", nav_services:"Nos services", nav_tracking:"Suivi de dossier", nav_contact:"Contact",
+    nav_who:"Qui sommes-nous ?", nav_about:"Notre mission", nav_services:"Que faisons-nous ?", nav_tracking:"Suivi de dossier", nav_contact:"Contactez-nous",
     tr_eyebrow:"Suivi de dossier", tr_title:"Suivez votre dossier", tr_sub:"Saisissez l'adresse e-mail utilisée lors de votre demande pour connaître l'état d'avancement.", tr_email_ph:"votre@email.com", tr_check:"Vérifier le statut", tr_checking:"Vérification…",
     tr_step_received:"Reçu", tr_step_progress:"En cours", tr_step_analysis:"Analyse", tr_step_done:"Finalisé",
     tr_empty:"Aucune demande trouvée pour cet e-mail. Vérifiez votre saisie ou contactez-nous directement.",
@@ -1541,7 +1565,7 @@ const T = {
     ac1_name:"Santé & recherche", ac1_desc:"Appui statistique pour hôpitaux, cliniques et chercheurs — études cas-témoins, analyses de cohortes, conception d'enquêtes pour thèses et interprétation des données.",
     ac2_name:"Industrie & entreprise", ac2_desc:"Études de marché, analyse de données financières et tableaux de bord pour des entreprises allant de l'agroalimentaire à l'industrie lourde et aux ports internationaux.",
     ac3_name:"Institutions publiques", ac3_desc:"Accompagnement quantitatif pour universités, banques, assurances et administrations locales en quête de rapports et d'une planification fondés sur des preuves.",
-    srv_eyebrow:"Ce que nous faisons", srv_title:"Nos services", srv_more:"En savoir plus", srv_cta:"Demander ce service",
+    srv_eyebrow:"Que faisons-nous ?", srv_title:"Nos services", srv_more:"En savoir plus", srv_cta:"Demander ce service",
     s1_name:"Enquêtes statistiques", s1_desc:"Concevoir et mener des enquêtes sur mesure avec une méthodologie rigoureuse et une documentation complète — du questionnaire à l'analyse finale.",
     s1_long:"Nous concevons vos enquêtes statistiques de bout en bout : définition des objectifs, plan d'échantillonnage, élaboration et test du questionnaire, coordination du terrain, puis rapport final entièrement documenté. Chaque étape respecte des standards scientifiques reconnus, pour des résultats crédibles, reproductibles et directement exploitables — pour hôpitaux, universités, entreprises ou organismes publics.",
     s2_name:"Traitement des données", s2_desc:"Nettoyage, codification, structuration et traitement statistique de vos données brutes pour obtenir un jeu de données propre et exploitable.",
@@ -1565,7 +1589,7 @@ const T = {
     edit_hint:"✏️ Cliquez sur le texte surligné pour le modifier."
   },
   ar: {
-    nav_who:"من نحن؟", nav_about:"مهمتنا", nav_services:"خدماتنا", nav_tracking:"متابعة الملف", nav_contact:"اتصل بنا",
+    nav_who:"من نحن؟", nav_about:"مهمتنا", nav_services:"ماذا نقدم؟", nav_tracking:"متابعة الملف", nav_contact:"اتصل بنا",
     tr_eyebrow:"متابعة الملف", tr_title:"تابع حالة ملفك", tr_sub:"أدخل البريد الإلكتروني الذي استخدمته عند تقديم طلبك للاطلاع على حالة تقدمه.", tr_email_ph:"بريدك الإلكتروني", tr_check:"تحقق من الحالة", tr_checking:"جارٍ التحقق…",
     tr_step_received:"تم الاستلام", tr_step_progress:"قيد المعالجة", tr_step_analysis:"التحليل", tr_step_done:"مكتمل",
     tr_empty:"لم يتم العثور على أي طلب بهذا البريد الإلكتروني. تحقق من إدخالك أو تواصل معنا مباشرة.",
@@ -1590,7 +1614,7 @@ const T = {
     ac1_name:"الصحة والبحث", ac1_desc:"دعم إحصائي للمستشفيات والعيادات والباحثين — دراسات الحالة والشواهد، تحليل الأفواج، تصميم استبيانات الأطروحات، وتفسير البيانات.",
     ac2_name:"الصناعة والمؤسسات", ac2_desc:"دراسات السوق وتحليل البيانات المالية ولوحات الأداء للشركات من الصناعات الغذائية إلى الصناعة الثقيلة والموانئ الدولية.",
     ac3_name:"المؤسسات العامة", ac3_desc:"دعم كمّي للجامعات والبنوك وشركات التأمين والإدارات المحلية الباحثة عن تقارير وتخطيط مبني على الأدلة.",
-    srv_eyebrow:"ما نقدّمه", srv_title:"خدماتنا", srv_more:"اعرف المزيد", srv_cta:"اطلب هذه الخدمة",
+    srv_eyebrow:"ماذا نقدم؟", srv_title:"خدماتنا", srv_more:"اعرف المزيد", srv_cta:"اطلب هذه الخدمة",
     s1_name:"المسوح الإحصائية", s1_desc:"تصميم وتنفيذ مسوح مخصّصة بمنهجية صارمة وتوثيق شامل — من تصميم الاستبيان إلى التحليل النهائي.",
     s1_long:"نصمّم مسوحكم الإحصائية من البداية إلى النهاية: تحديد الأهداف، خطة المعاينة، إعداد واختبار الاستبيان، تنسيق العمل الميداني، وتسليم تقرير نهائي موثّق بالكامل. تتبع كل خطوة معايير علمية معترف بها لضمان نتائج موثوقة وقابلة للتكرار وجاهزة لدعم قرارات حقيقية — للمستشفيات والجامعات والشركات والمؤسسات العامة.",
     s2_name:"معالجة البيانات", s2_desc:"تنظيف وترميز وهيكلة ومعالجة إحصائية لبياناتكم الخام لتحويلها إلى قاعدة بيانات نظيفة وجاهزة للتحليل.",
@@ -2096,21 +2120,31 @@ function saveFile() {
 })();
 
 
-/* FLOATING MATH SYMBOLS */
+/* FLOATING MATH SYMBOLS — works on mobile (negative delay = already mid-flight) */
 (function(){
   const box = document.getElementById('math-symbols');
   if (!box) return;
   const symbols = ['σ', 'μ', 'χ²', 'Σ', 'β', 'α', 'ρ', 'σ²', 'n', 'x̄', 'P', 'λ', 'θ', 'ε'];
-  const count = 26;
+  const isMobile = window.matchMedia('(max-width: 900px)').matches
+    || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+  // Fewer on phone for smoothness, but always some on screen thanks to negative delays
+  const count = isMobile ? 14 : 26;
   for (let i = 0; i < count; i++) {
     const el = document.createElement('span');
     el.className = 'math-sym';
     el.textContent = symbols[i % symbols.length];
-    const size = 18 + Math.random() * 38;
-    const left = Math.random() * 100;
-    const dur = 14 + Math.random() * 22;
-    const delay = Math.random() * 18;
-    el.style.cssText = 'font-size:' + size + 'px; left:' + left + '%; animation-duration:' + dur + 's; animation-delay:' + delay + 's;';
+    const size = isMobile ? (20 + Math.random() * 28) : (18 + Math.random() * 38);
+    const left = Math.random() * 92 + 2; // keep off edges a bit
+    const dur = isMobile ? (10 + Math.random() * 12) : (14 + Math.random() * 22);
+    // Negative delay = symbol already partway through the flight (visible immediately)
+    const delay = -(Math.random() * dur);
+    el.style.cssText =
+      'font-size:' + size + 'px;' +
+      'left:' + left + '%;' +
+      'animation-duration:' + dur + 's;' +
+      'animation-delay:' + delay + 's;' +
+      '-webkit-animation-duration:' + dur + 's;' +
+      '-webkit-animation-delay:' + delay + 's;';
     box.appendChild(el);
   }
 })();
