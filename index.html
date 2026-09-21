@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>DATA PREVISION – Jijel</title>
 <!-- FormSubmit handles email routing server-side -->
 <link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -92,14 +92,28 @@ html[data-theme="light"] .theme-toggle .icon-moon { display:none; }
 html[data-theme="light"] .theme-toggle .icon-sun { display:block; }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
+img, video, canvas, svg { max-width: 100%; height: auto; }
+section, main, header, footer { max-width: 100%; box-sizing: border-box; }
+
+html {
+  scroll-behavior:smooth;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
 body {
   font-family:'Inter', system-ui, sans-serif;
   background: var(--navy);
   color: var(--text);
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ── MESH BACKGROUND ── */
@@ -161,6 +175,7 @@ nav {
 .logo img {
   height:118px !important;
   width:auto;
+  max-width: min(118px, 28vw);
   object-fit:contain;
 }
 .logo-icon {
@@ -327,7 +342,7 @@ nav {
   opacity:.9;
 }
 .hero-statistics::before {
-  content:''; position:absolute; width:72vw; height:72vw; min-width:650px; min-height:650px;
+  content:''; position:absolute; width:min(72vw, 100%); height:min(72vw, 100%); min-width:0; min-height:0; max-width:100vw;
   left:50%; top:48%; transform:translate(-50%,-50%); border-radius:50%;
   background:radial-gradient(circle, rgba(56,189,248,.13) 0%, rgba(56,189,248,.045) 34%, transparent 68%);
   animation:statHalo 7s ease-in-out infinite alternate;
@@ -923,13 +938,18 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  .identity-inner { max-width:100%; grid-template-columns: 1fr; }
+  .identity-inner { max-width:100%; grid-template-columns: 1fr; width:100%; }
   .about-grid { grid-template-columns:1fr; }
   .contact-grid { grid-template-columns:1fr; gap:2.5rem; }
-  nav { padding:.85rem 1.2rem; gap:.5rem; }
+  nav {
+    padding:.7rem .9rem; gap:.35rem;
+    width:100%; max-width:100%;
+    flex-wrap: nowrap;
+  }
   .nav-links {
     display:none;
-    position:fixed; top:64px; left:0; right:0;
+    position:fixed; top:56px; left:0; right:0;
+    width:100%; max-width:100%;
     flex-direction:column; gap:0;
     background:rgba(7,15,30,.97);
     backdrop-filter:blur(20px);
@@ -944,37 +964,68 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
     border-bottom:1px solid var(--border);
   }
   .nav-links a:last-child { border-bottom:none; }
-  .nav-toggle { display:flex; }
-  .logo { font-size:1.35rem; }
-  .logo-icon { width:80px; height:80px; }
-  .logo-icon svg, .logo img { height:80px !important; }
-  #hero { padding:7rem 1.4rem 4rem; min-height:92vh; }
-  .hero-title { font-size:clamp(2.2rem,9vw,3.6rem); }
-  .hero-tagline { font-size:clamp(1.15rem,4.5vw,1.5rem); }
-  .hero-sub { font-size:1rem; margin:1.2rem auto 2rem; }
-  .hero-cta { flex-direction:column; align-items:stretch; width:100%; max-width:320px; }
-  .hero-cta .btn { justify-content:center; width:100%; }
-  .section-title { font-size:clamp(1.6rem,6vw,2.4rem); }
-  .services-grid { grid-template-columns:1fr; }
-  .srv-card { padding:1.5rem; }
-  .srv-img { height:140px; }
-  .pillar { padding:1rem 1.1rem; }
-  .ci { padding:1rem 1.1rem; }
-  .tracking-form { flex-direction:column; }
-  .tracking-form input { min-width:0; width:100%; }
-  footer { padding:1.5rem 1.2rem; flex-direction:column; text-align:center; gap:.6rem; }
+  .nav-toggle { display:flex; flex-shrink:0; }
+  .logo { font-size:1.1rem; gap:.4rem; min-width:0; flex-shrink:1; }
+  .logo-icon { width:52px; height:52px; flex-shrink:0; }
+  .logo-icon svg, .logo img { height:52px !important; width:auto !important; max-width:52px; }
+  .lang-switcher { flex-shrink:0; gap:.2rem; }
+  #hero { padding:6rem 1.1rem 3.5rem; min-height:auto; width:100%; max-width:100%; }
+  .hero-title { font-size:clamp(1.85rem,8vw,3.2rem); word-wrap:break-word; overflow-wrap:break-word; }
+  .hero-tagline { font-size:clamp(1.05rem,4vw,1.4rem); }
+  .hero-sub { font-size:.95rem; margin:1.1rem auto 2rem; max-width:100%; padding:0 .25rem; }
+  .hero-cta { flex-direction:column; align-items:stretch; width:100%; max-width:100%; padding:0 .25rem; box-sizing:border-box; }
+  .hero-cta .btn { justify-content:center; width:100%; max-width:100%; box-sizing:border-box; }
+  .hero-badge { font-size:.65rem; letter-spacing:.12em; max-width:100%; }
+  .section-title { font-size:clamp(1.45rem,5.5vw,2.2rem); word-wrap:break-word; }
+  .services-grid { grid-template-columns:1fr; width:100%; }
+  .srv-card { padding:1.35rem; width:100%; max-width:100%; box-sizing:border-box; }
+  .srv-img { height:140px; max-width:100%; }
+  .pillar { padding:1rem 1.1rem; width:100%; box-sizing:border-box; }
+  .ci { padding:1rem 1.1rem; width:100%; box-sizing:border-box; }
+  .tracking-form { flex-direction:column; width:100%; max-width:100%; }
+  .tracking-form input { min-width:0; width:100%; max-width:100%; box-sizing:border-box; font-size:16px; }
+  .contact-form input, .contact-form textarea, .contact-form select,
+  .fg input, .fg textarea, .fg select { font-size:16px; max-width:100%; box-sizing:border-box; }
+  #identity, #about, #services, #contact, #tracking {
+    padding-left:1.1rem; padding-right:1.1rem; width:100%; max-width:100%; box-sizing:border-box;
+  }
+  .identity-inner, .about-inner, .services-inner, .contact-inner, .tracking-inner {
+    width:100%; max-width:100%; box-sizing:border-box;
+  }
+  .hero-statistics::before { min-width:0 !important; min-height:0 !important; width:90vw !important; height:90vw !important; max-width:100% !important; }
+  .normal-visual { width:100% !important; max-width:100% !important; left:0 !important; transform:none !important; }
+  footer { padding:1.5rem 1.2rem; flex-direction:column; text-align:center; gap:.6rem; width:100%; box-sizing:border-box; }
   #edit-bar { bottom:1rem; right:1rem; }
+  .tr-steps { flex-wrap:wrap; width:100%; }
+  .tr-card { width:100%; box-sizing:border-box; }
+  .srv-modal { width:calc(100% - 1.5rem); max-width:100%; box-sizing:border-box; }
+  .bar-lbl { min-width:90px; font-size:.75rem; }
 }
 @media(max-width:600px){
   .services-grid { grid-template-columns:1fr; }
-  .lang-btn { padding:.3rem .55rem; font-size:.78rem; }
-  .theme-toggle { width:36px; height:36px; margin-left:.3rem; }
-  nav { padding:.7rem 1rem; }
-  #hero { padding:6.5rem 1.1rem 3.5rem; }
-  .body-text { font-size:.92rem; }
-  .about-card { padding:1.5rem; }
-  .srv-modal { padding:1.8rem 1.4rem; max-height:90vh; }
-  .contact-form .btn { width:100%; justify-content:center; }
+  .lang-btn { padding:.28rem .45rem; font-size:.72rem; }
+  .theme-toggle { width:34px; height:34px; margin-left:.2rem; flex-shrink:0; }
+  nav { padding:.55rem .7rem; gap:.25rem; }
+  .logo-icon { width:44px; height:44px; }
+  .logo-icon svg, .logo img { height:44px !important; max-width:44px; }
+  .logo { font-size:1rem; }
+  #hero { padding:5.5rem .9rem 3rem; }
+  .hero-title { font-size:clamp(1.7rem,8.5vw,2.6rem); }
+  .hero-sub { font-size:.9rem; line-height:1.65; }
+  .body-text { font-size:.9rem; }
+  .about-card { padding:1.25rem; }
+  .srv-modal { padding:1.5rem 1.15rem; max-height:90vh; }
+  .contact-form .btn, .tracking-form .btn { width:100%; justify-content:center; }
+  #identity, #about, #services, #contact, #tracking { padding-left:.9rem; padding-right:.9rem; }
+  .section-title { font-size:clamp(1.35rem,6vw,1.9rem); }
+}
+@media(max-width:400px){
+  nav { padding:.5rem .55rem; }
+  .logo-icon { width:38px; height:38px; }
+  .logo-icon svg, .logo img { height:38px !important; max-width:38px; }
+  .lang-btn { padding:.22rem .35rem; font-size:.68rem; }
+  .hero-title { font-size:clamp(1.5rem,8vw,2.2rem); }
+  .hero-badge { font-size:.58rem; padding:.35rem .75rem; letter-spacing:.08em; }
 }
 @media(prefers-reduced-motion:reduce){
   *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; }
