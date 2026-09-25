@@ -395,10 +395,12 @@ html[data-theme="light"] .identity-illustration .identity-illust-img {
 
 /* Scroll indicator */
 .scroll-hint {
-  position:absolute; bottom:2.5rem;
+  position:relative;
+  margin-top: 2.2rem;
   display:flex; flex-direction:column; align-items:center; gap:.4rem;
   color: var(--muted); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
   animation:fadeUp .7s .6s ease both;
+  z-index: 5;
 }
 .scroll-line {
   width:1.5px; height:40px;
@@ -1062,6 +1064,24 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
 @media(max-width:800px){
   #charts-grid { grid-template-columns:1fr !important; }
 }
+
+/* Force phone numbers to stay LTR in Arabic / RTL */
+.phone-ltr,
+.phone-ltr a,
+[dir="rtl"] .phone-ltr,
+[dir="rtl"] .phone-ltr a,
+html[dir="rtl"] a[href^="tel:"] {
+  direction: ltr !important;
+  unicode-bidi: bidi-override !important;
+  text-align: left !important;
+  display: inline-block;
+}
+#f-phone {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  text-align: left !important;
+}
+
 </style>
 </head>
 <body class="">
@@ -1423,7 +1443,7 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
         </div>
         <div class="ci">
           <div class="ci-icon">📞</div>
-          <div><div class="ci-lbl" data-i18n="ct_phone">Phone</div><div class="ci-val"><a href="tel:+213776277825" style="color:inherit;text-decoration:none;">+213 776 277 825</a></div></div>
+          <div><div class="ci-lbl" data-i18n="ct_phone">Phone</div><div class="ci-val phone-ltr" dir="ltr" lang="en"><a href="tel:+213776277825" dir="ltr" style="color:inherit;text-decoration:none;direction:ltr !important;unicode-bidi:bidi-override;display:inline-block;">&#8237;+213 776 277 825&#8236;</a></div></div>
         </div>
         <div class="ci">
           <div class="ci-icon">🔒</div>
@@ -1442,7 +1462,7 @@ html[data-theme="light"] .hero-aurora::after { opacity:0.12; }
         </div>
         <div class="fg">
           <label data-i18n="f_phone">Phone</label>
-          <input id="f-phone" type="tel" data-i18n-ph="f_phone_ph" placeholder="+213 …" autocomplete="tel">
+          <input id="f-phone" type="tel" data-i18n-ph="f_phone_ph" placeholder="+213 …" autocomplete="tel" dir="ltr" class="phone-ltr" style="direction:ltr !important;unicode-bidi:isolate;text-align:left;">
         </div>
         <div class="fg">
           <label data-i18n="f_srv">Service needed</label>
